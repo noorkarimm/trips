@@ -316,10 +316,6 @@ export default function Home() {
     setInputValue("");
   };
 
-  const handleExampleClick = (prompt: string) => {
-    setInputValue(prompt);
-  };
-
   const resetChat = () => {
     setChatMessages([]);
     setConversationId(null);
@@ -345,10 +341,7 @@ export default function Home() {
               Plan your perfect trip with{" "}
               <span className="text-primary">AI</span>
             </h2>
-            <p className="text-lg md:text-xl text-text-primary/70 mb-8 leading-relaxed">
-              Just tell us what you want. No more browsing dozens of tabs or comparing endless options.
-              Get personalized itineraries instantly.
-            </p>
+
             
 
           </div>
@@ -417,42 +410,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Example prompts below chat input - Two rows layout */}
-            {!isConversationMode && (
-              <div className="w-full max-w-4xl mt-6 space-y-4">
-                {/* First row - side by side */}
-                <div className="flex flex-row justify-center items-center gap-4 flex-wrap">
-                  <button
-                    onClick={() => handleExampleClick("Food-focused weekend in Chicago with my spouse")}
-                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                  >
-                    "Food-focused weekend in Chicago with my spouse"
-                  </button>
-                  <button
-                    onClick={() => handleExampleClick("Family beach vacation under $3K")}
-                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                  >
-                    "Family beach vacation under $3K"
-                  </button>
-                </div>
-                
-                {/* Second row - side by side */}
-                <div className="flex flex-row justify-center items-center gap-4 flex-wrap">
-                  <button
-                    onClick={() => handleExampleClick("Adventure trip to New Zealand for 2 weeks")}
-                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                  >
-                    "Adventure trip to New Zealand for 2 weeks"
-                  </button>
-                  <button
-                    onClick={() => handleExampleClick("Romantic getaway to Paris with wine tasting")}
-                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                  >
-                    "Romantic getaway to Paris with wine tasting"
-                  </button>
-                </div>
-              </div>
-            )}
+
           </div>
         </div>
       ) : (
