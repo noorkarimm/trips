@@ -101,10 +101,13 @@ This is a full-stack travel itinerary generator application that uses AI to crea
 ```
 Changelog:
 - June 21, 2025. Initial setup
+- June 21, 2025. Added visual elements with image generation for restaurants, hotels, and activities
+- June 21, 2025. Implemented hover preview cards with AI-generated images
 ```
 
 ## User Preferences
 
 ```
 Preferred communication style: Simple, everyday language.
+Visual interface preference: Wants visual elements and images for places like restaurants and hotels with hover previews.
 ```

@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { generateTripSchema, insertTripSchema } from "@shared/schema";
-import { generateTripItinerary } from "./services/openai";
+import { generateTripItinerary, generateActivityImages } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Generate trip itinerary
@@ -12,15 +12,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const result = await generateTripItinerary(validatedRequest);
       
+      // Generate images for activities
+      const enhancedResult = await generateActivityImages(result);
+      
       // Save the generated trip
       const trip = await storage.createTrip({
         userId: null, // For now, not requiring user auth
-        title: result.title,
+        title: enhancedResult.title,
         description: validatedRequest.description,
-        destination: result.destination,
-        duration: result.duration,
-        budget: result.budget,
-        itinerary: result.itinerary,
+        destination: enhancedResult.destination,
+        duration: enhancedResult.duration,
+        budget: enhancedResult.budget,
+        itinerary: enhancedResult.itinerary,
         preferences: validatedRequest.preferences || null,
       });
 

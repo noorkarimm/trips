@@ -32,6 +32,8 @@ export const itineraryDay = z.object({
     location: z.string().optional(),
     cost: z.number().optional(),
     category: z.string().optional(),
+    imagePrompt: z.string().optional(),
+    imageUrl: z.string().optional(),
   })),
 });
 

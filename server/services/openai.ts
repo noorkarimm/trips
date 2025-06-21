@@ -36,7 +36,8 @@ export async function generateTripItinerary(request: GenerateTripRequest): Promi
                 "description": "Detailed description",
                 "location": "Specific location/address",
                 "cost": estimated_cost_in_dollars,
-                "category": "food|accommodation|activity|transport"
+                "category": "food|accommodation|activity|transport",
+                "imagePrompt": "Brief description for image generation (e.g., 'cozy Italian restaurant with outdoor seating')"
               }
             ]
           }
@@ -49,7 +50,9 @@ export async function generateTripItinerary(request: GenerateTripRequest): Promi
       }
     }
     
-    Make the itinerary detailed, realistic, and personalized. Include specific restaurant names, attractions, and practical information like timing and costs.`;
+    Make the itinerary detailed, realistic, and personalized. Include specific restaurant names, attractions, and practical information like timing and costs. 
+    
+    For each activity, provide an "imagePrompt" field with a brief, descriptive prompt that could be used to generate or search for relevant images. Focus on visual elements that would help users understand what the place looks like.`;
 
     const userPrompt = `Create a trip itinerary for: "${description}"
     
@@ -82,5 +85,60 @@ export async function generateTripItinerary(request: GenerateTripRequest): Promi
   } catch (error) {
     console.error("OpenAI API Error:", error);
     throw new Error(`Failed to generate trip itinerary: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+export async function generateActivityImages(tripData: {
+  title: string;
+  destination: string;
+  duration: number;
+  budget?: number;
+  itinerary: TripItinerary;
+}): Promise<{
+  title: string;
+  destination: string;
+  duration: number;
+  budget?: number;
+  itinerary: TripItinerary;
+}> {
+  try {
+    const enhancedItinerary = { ...tripData.itinerary };
+    
+    // Generate images for select activities (to avoid hitting API limits)
+    for (const day of enhancedItinerary.days) {
+      for (let i = 0; i < day.activities.length; i++) {
+        const activity = day.activities[i];
+        
+        // Generate images for key activities (restaurants, hotels, major attractions)
+        if (activity.imagePrompt && 
+            (activity.category === 'food' || activity.category === 'accommodation' || 
+             (activity.category === 'activity' && i < 2))) { // Limit to first 2 activities per day
+          
+          try {
+            const imageResponse = await openai.images.generate({
+              model: "dall-e-3",
+              prompt: `${activity.imagePrompt}, high quality, photorealistic, travel photography style`,
+              n: 1,
+              size: "1024x1024",
+              quality: "standard",
+            });
+            
+            activity.imageUrl = imageResponse.data[0].url;
+          } catch (imageError) {
+            console.warn(`Failed to generate image for activity: ${activity.title}`, imageError);
+            // Continue without image if generation fails
+          }
+        }
+      }
+    }
+    
+    return {
+      ...tripData,
+      itinerary: enhancedItinerary
+    };
+  } catch (error) {
+    console.error("Error generating activity images:", error);
+    // Return original data if image generation fails
+    return tripData;
   }
 }

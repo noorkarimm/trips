@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
 import type { GenerateTripRequest, TripItinerary, ItineraryDay } from "@shared/schema";
-import { MapPin, DollarSign, Clock, Star, Utensils, Bed, Car, Camera } from "lucide-react";
+import { MapPin, DollarSign, Clock, Star, Utensils, Bed, Car, Camera, Image } from "lucide-react";
 
 interface GeneratedTrip {
   id: number;
@@ -92,27 +92,54 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
               
               <div className="space-y-3">
                 {day.activities.map((activity, activityIndex) => (
-                  <div key={activityIndex} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50/50 transition-colors">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getCategoryColor(activity.category)}`}>
-                      {getCategoryIcon(activity.category)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-medium text-text-primary text-sm">{activity.time}</span>
-                        <span className="text-text-primary/40">•</span>
-                        <span className="font-semibold text-text-primary">{activity.title}</span>
-                        {activity.cost && (
-                          <>
-                            <span className="text-text-primary/40">•</span>
-                            <span className="text-sm text-green-600 font-medium">${activity.cost}</span>
-                          </>
+                  <div key={activityIndex} className="group relative">
+                    <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50/50 transition-all duration-200 cursor-pointer">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getCategoryColor(activity.category)}`}>
+                        {getCategoryIcon(activity.category)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="font-medium text-text-primary text-sm">{activity.time}</span>
+                          <span className="text-text-primary/40">•</span>
+                          <span className="font-semibold text-text-primary">{activity.title}</span>
+                          {activity.cost && (
+                            <>
+                              <span className="text-text-primary/40">•</span>
+                              <span className="text-sm text-green-600 font-medium">${activity.cost}</span>
+                            </>
+                          )}
+                          {activity.imageUrl && (
+                            <div className="ml-2 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Image className="w-2.5 h-2.5 text-blue-600" />
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-text-primary/70 text-sm">{activity.description}</p>
+                        {activity.location && (
+                          <div className="flex items-center mt-1 text-xs text-text-primary/60">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {activity.location}
+                          </div>
                         )}
                       </div>
-                      <p className="text-text-primary/70 text-sm">{activity.description}</p>
-                      {activity.location && (
-                        <div className="flex items-center mt-1 text-xs text-text-primary/60">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {activity.location}
+                      
+                      {/* Image Preview on Hover */}
+                      {activity.imageUrl && (
+                        <div className="absolute left-full top-0 ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none z-10">
+                          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-2 max-w-sm">
+                            <img 
+                              src={activity.imageUrl} 
+                              alt={activity.title}
+                              className="w-64 h-48 object-cover rounded-lg"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                            <div className="mt-2 p-2">
+                              <h4 className="font-semibold text-sm text-text-primary">{activity.title}</h4>
+                              <p className="text-xs text-text-primary/70 mt-1">{activity.location}</p>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
