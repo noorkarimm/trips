@@ -17,12 +17,7 @@ interface GeneratedTrip {
   itinerary: TripItinerary;
 }
 
-const examplePrompts = [
-  "Food-focused weekend in Chicago with my spouse",
-  "Family beach vacation under $3K",
-  "Adventure trip to New Zealand for 2 weeks",
-  "Romantic getaway to Paris with wine tasting"
-];
+
 
 const categoryIcons = {
   food: Utensils,
