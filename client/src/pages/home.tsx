@@ -346,7 +346,7 @@ export default function Home() {
               <h1 className="text-3xl font-bold text-text-primary">Trips</h1>
             </div>
             
-            <h2 className="text-4xl md:text-6xl font-bold text-text-primary mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-6 leading-tight">
               Plan your perfect trip with{" "}
               <span className="text-primary">AI</span>
             </h2>
@@ -424,16 +424,29 @@ export default function Home() {
 
             {/* Example prompts below chat input */}
             {!isConversationMode && (
-              <div className="flex flex-wrap justify-center gap-3 mt-6">
-                {examplePrompts.map((prompt, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleExampleClick(prompt)}
-                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                  >
-                    "{prompt}"
-                  </button>
-                ))}
+              <div className="flex flex-col items-center gap-3 mt-6">
+                <div className="flex flex-wrap justify-center gap-3">
+                  {examplePrompts.slice(0, 2).map((prompt, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleExampleClick(prompt)}
+                      className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
+                    >
+                      "{prompt}"
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {examplePrompts.slice(2, 4).map((prompt, index) => (
+                    <button
+                      key={index + 2}
+                      onClick={() => handleExampleClick(prompt)}
+                      className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
+                    >
+                      "{prompt}"
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
