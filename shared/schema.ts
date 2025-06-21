@@ -74,9 +74,8 @@ export const conversationSchema = z.object({
 
 export const conversationState = z.object({
   id: z.string(),
-  currentStep: z.enum(['initial', 'destination', 'dates', 'vibe', 'stay_style', 'activities', 'generating']),
+  currentStep: z.enum(['initial', 'dates', 'vibe', 'stay_style', 'activities', 'generating']),
   responses: z.object({
-    destination: z.string().optional(),
     dates: z.string().optional(),
     vibe: z.string().optional(),
     stayStyle: z.string().optional(),

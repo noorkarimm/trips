@@ -372,14 +372,14 @@ export default function Home() {
           {/* Chat Messages */}
           {isConversationMode && chatMessages.length > 0 && (
             <div className="w-full max-w-2xl mb-8">
-              <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-6 max-h-96 overflow-y-auto">
+              <div className="bg-transparent border-none rounded-2xl p-6 max-h-96 overflow-y-auto">
                 <div className="space-y-4">
                   {chatMessages.map((msg, index) => (
                     <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                       <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
                         msg.role === 'user' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-gray-100 text-text-primary'
+                          ? 'bg-primary text-white shadow-lg' 
+                          : 'bg-white/90 backdrop-blur-sm text-text-primary shadow-lg border border-white/20'
                       }`}>
                         <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                       </div>
@@ -391,7 +391,7 @@ export default function Home() {
                 <Button 
                   variant="ghost" 
                   onClick={resetChat}
-                  className="text-text-primary hover:text-primary text-sm"
+                  className="text-text-primary hover:text-primary text-sm bg-white/80 backdrop-blur-sm rounded-full px-6"
                 >
                   Start Over
                 </Button>

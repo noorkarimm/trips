@@ -133,31 +133,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 async function processConversationStep(conversation: ConversationState, message: string) {
   const questions = {
-    destination: "What country or location are you thinking of visiting?",
-    dates: "What month or specific dates are you planning your trip?",
-    vibe: "Do you want a mix of nature, city, beach, or adventure? Any specific regions or landscapes you're interested in (like mountains, rainforests, coastlines, etc.)?",
-    stay_style: "Do you prefer hotels, eco-lodges, vacation rentals, or something else?",
-    activities: "Any specific adventures or interests you want to include (like zip-lining, wildlife tours, snorkeling, cultural experiences, etc.)?"
+    dates: "Travel Dates – What month or specific dates are you planning your trip?",
+    vibe: "Vibe – Do you want a mix of nature, city, beach, or adventure? Any specific regions or landscapes you're interested in (like mountains, rainforests, coastlines, etc.)?",
+    stay_style: "Stay Style – Do you prefer hotels, eco-lodges, vacation rentals, or something else?",
+    activities: "Must-Do Activities – Any specific adventures or interests your family wants to include (like zip-lining, wildlife tours, snorkeling, cultural experiences, etc.)?"
   };
 
   switch (conversation.currentStep) {
     case 'initial':
-      conversation.currentStep = 'destination';
-      await storage.saveConversation(conversation);
-      return {
-        success: true,
-        response: `Great! I'd love to help you plan the perfect trip. Let me ask you a few questions to create a personalized itinerary.\n\n${questions.destination}`,
-        conversationId: conversation.id,
-        isComplete: false
-      };
-
-    case 'destination':
-      conversation.responses.destination = message;
       conversation.currentStep = 'dates';
       await storage.saveConversation(conversation);
       return {
         success: true,
-        response: questions.dates,
+        response: `Great! I'd love to help you plan the perfect trip. Let me ask you a few quick questions:\n\n${questions.dates}`,
+        conversationId: conversation.id,
+        isComplete: false
+      };
+
+    case 'dates':
+      conversation.responses.dates = message;
+      conversation.currentStep = 'vibe';
+      await storage.saveConversation(conversation);
+      return {
+        success: true,
+        response: questions.vibe,
         conversationId: conversation.id,
         isComplete: false
       };
@@ -203,7 +202,6 @@ async function processConversationStep(conversation: ConversationState, message:
       // Generate the final itinerary
       const fullDescription = `${conversation.initialDescription}
       
-Destination: ${conversation.responses.destination}
 Travel Dates: ${conversation.responses.dates}
 Vibe/Style: ${conversation.responses.vibe}
 Accommodation: ${conversation.responses.stayStyle}
@@ -228,7 +226,7 @@ Activities: ${conversation.responses.activities}`;
 
       return {
         success: true,
-        response: "Perfect! I've created your personalized itinerary based on your preferences.",
+        response: "Perfect! With your answers, I've created the best destinations, activities, and accommodations—all within your budget and aligned with your travel style!",
         conversationId: conversation.id,
         isComplete: true,
         trip: {
