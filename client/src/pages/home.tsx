@@ -401,7 +401,7 @@ export default function Home() {
 
           {/* Chat Input */}
           <div className="w-full max-w-2xl relative">
-            <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-3 transition-all duration-300 hover:shadow-xl">
+            <div className="bg-white/95 backdrop-blur-sm border border-black/20 rounded-2xl p-3 transition-all duration-300">
               <ChatInput
                 variant="default"
                 value={inputValue}
