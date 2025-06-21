@@ -115,13 +115,10 @@
   background: hsl(var(--muted-foreground));
 }
 
-/* Hover card positioning */
-.group:hover .group-hover\:opacity-100 {
-  z-index: 50;
-}
-
-/* Ensure hover cards don't interfere with layout */
-.group {
-  position: relative;
-  overflow: visible;
+/* Line clamp utility for text truncation */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }

@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ChatInput, ChatInputTextArea, ChatInputSubmit } from "@/components/ui/chat-input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { HoverPreview } from "@/components/ui/hover-preview";
 import { apiRequest } from "@/lib/queryClient";
 import type { GenerateTripRequest, TripItinerary, ItineraryDay } from "@shared/schema";
 import { MapPin, DollarSign, Clock, Star, Utensils, Bed, Car, Camera, Image } from "lucide-react";
@@ -129,8 +130,11 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
               </div>
               
               <div className="space-y-3">
-                {day.activities.map((activity, activityIndex) => (
-                  <div key={activityIndex} className="group relative">
+                {day.activities.map((activity, activityIndex) => {
+                  const hasImage = activity.imageUrl || activity.category === 'food' || activity.category === 'accommodation' || activity.category === 'activity';
+                  const imageUrl = activity.imageUrl || getDemoImage(activity.category, activity.title);
+                  
+                  const ActivityContent = (
                     <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50/50 transition-all duration-200 cursor-pointer">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getCategoryColor(activity.category)}`}>
                         {getCategoryIcon(activity.category)}
@@ -146,7 +150,7 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
                               <span className="text-sm text-green-600 font-medium">${activity.cost}</span>
                             </>
                           )}
-                          {(activity.imageUrl || activity.category === 'food' || activity.category === 'accommodation') && (
+                          {hasImage && (
                             <div className="ml-2 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
                               <Image className="w-2.5 h-2.5 text-blue-600" />
                             </div>
@@ -160,29 +164,27 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
                           </div>
                         )}
                       </div>
-                      
-                      {/* Image Preview on Hover */}
-                      {(activity.imageUrl || activity.category === 'food' || activity.category === 'accommodation' || activity.category === 'activity') && (
-                        <div className="absolute left-full top-0 ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none z-10">
-                          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-2 max-w-sm">
-                            <img 
-                              src={activity.imageUrl || getDemoImage(activity.category, activity.title)}
-                              alt={activity.title}
-                              className="w-64 h-48 object-cover rounded-lg"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                            <div className="mt-2 p-2">
-                              <h4 className="font-semibold text-sm text-text-primary">{activity.title}</h4>
-                              <p className="text-xs text-text-primary/70 mt-1">{activity.location}</p>
-                            </div>
-                          </div>
-                        </div>
+                    </div>
+                  );
+
+                  return (
+                    <div key={activityIndex}>
+                      {hasImage ? (
+                        <HoverPreview
+                          imageUrl={imageUrl}
+                          title={activity.title}
+                          description={`${activity.location ? activity.location + ' • ' : ''}${activity.description}`}
+                          previewWidth={400}
+                          previewHeight={300}
+                        >
+                          {ActivityContent}
+                        </HoverPreview>
+                      ) : (
+                        ActivityContent
                       )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
