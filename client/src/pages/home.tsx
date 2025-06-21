@@ -242,9 +242,35 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
   );
 }
 
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export default function Home() {
   const [inputValue, setInputValue] = useState("");
   const [generatedTrip, setGeneratedTrip] = useState<GeneratedTrip | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [isConversationMode, setIsConversationMode] = useState(false);
+
+  const chatMutation = useMutation({
+    mutationFn: async (data: { message: string; conversationId?: string }) => {
+      const response = await apiRequest("POST", "/api/chat", data);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+        setConversationId(data.conversationId);
+        
+        if (data.isComplete && data.trip) {
+          setGeneratedTrip(data.trip);
+          setIsConversationMode(false);
+        }
+      }
+    },
+  });
 
   const generateTripMutation = useMutation({
     mutationFn: async (request: GenerateTripRequest) => {
@@ -261,14 +287,49 @@ export default function Home() {
   const handleSubmit = () => {
     if (inputValue.trim().length === 0) return;
     
-    generateTripMutation.mutate({
-      description: inputValue,
-      preferences: {} // Could be expanded to collect user preferences
-    });
+    if (isConversationMode) {
+      // Add user message to chat
+      setChatMessages(prev => [...prev, { role: 'user', content: inputValue }]);
+      
+      chatMutation.mutate({
+        message: inputValue,
+        conversationId: conversationId || undefined
+      });
+    } else {
+      // Check if this looks like a complex request that should use conversation mode
+      const complexKeywords = ['family', 'adventure', 'budget', 'weeks', 'months', 'activities', 'preferences'];
+      const shouldUseConversation = complexKeywords.some(keyword => 
+        inputValue.toLowerCase().includes(keyword)
+      );
+
+      if (shouldUseConversation) {
+        setIsConversationMode(true);
+        setChatMessages([{ role: 'user', content: inputValue }]);
+        
+        chatMutation.mutate({
+          message: inputValue
+        });
+      } else {
+        // Simple trip generation
+        generateTripMutation.mutate({
+          description: inputValue,
+          preferences: {}
+        });
+      }
+    }
+    
+    setInputValue("");
   };
 
   const handleExampleClick = (prompt: string) => {
     setInputValue(prompt);
+  };
+
+  const resetChat = () => {
+    setChatMessages([]);
+    setConversationId(null);
+    setIsConversationMode(false);
+    setGeneratedTrip(null);
   };
 
   return (
@@ -308,6 +369,36 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Chat Messages */}
+          {isConversationMode && chatMessages.length > 0 && (
+            <div className="w-full max-w-2xl mb-8">
+              <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-6 max-h-96 overflow-y-auto">
+                <div className="space-y-4">
+                  {chatMessages.map((msg, index) => (
+                    <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                      <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+                        msg.role === 'user' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-gray-100 text-text-primary'
+                      }`}>
+                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 text-center">
+                <Button 
+                  variant="ghost" 
+                  onClick={resetChat}
+                  className="text-text-primary hover:text-primary text-sm"
+                >
+                  Start Over
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Chat Input */}
           <div className="w-full max-w-2xl relative">
             <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-3 transition-all duration-300 hover:shadow-xl">
@@ -316,23 +407,28 @@ export default function Home() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onSubmit={handleSubmit}
-                loading={generateTripMutation.isPending}
+                loading={generateTripMutation.isPending || chatMutation.isPending}
                 className="bg-transparent border-none shadow-none"
               >
                 <ChatInputTextArea 
-                  placeholder="Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
+                  placeholder={isConversationMode 
+                    ? "Type your answer..." 
+                    : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
+                  }
                   className="bg-transparent border-none focus-visible:ring-0 shadow-none placeholder:text-text-primary/50"
                 />
                 <ChatInputSubmit className="bg-primary hover:bg-primary/90 text-white border-primary" />
               </ChatInput>
             </div>
             
-            {generateTripMutation.isPending && <TypingIndicator />}
+            {(generateTripMutation.isPending || chatMutation.isPending) && <TypingIndicator />}
             
-            {generateTripMutation.error && (
+            {(generateTripMutation.error || chatMutation.error) && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-600 text-sm">
-                  {generateTripMutation.error instanceof Error ? generateTripMutation.error.message : "An error occurred"}
+                  {(generateTripMutation.error || chatMutation.error) instanceof Error 
+                    ? (generateTripMutation.error || chatMutation.error)?.message 
+                    : "An error occurred"}
                 </p>
               </div>
             )}

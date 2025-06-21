@@ -1,4 +1,4 @@
-import { users, trips, type User, type InsertUser, type Trip, type InsertTrip } from "@shared/schema";
+import { users, trips, type User, type InsertUser, type Trip, type InsertTrip, type ConversationState } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -8,17 +8,21 @@ export interface IStorage {
   getTripsByUser(userId: number): Promise<Trip[]>;
   getTrip(id: number): Promise<Trip | undefined>;
   getAllTrips(): Promise<Trip[]>;
+  getConversation(id: string): Promise<ConversationState | undefined>;
+  saveConversation(conversation: ConversationState): Promise<ConversationState>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private trips: Map<number, Trip>;
+  private conversations: Map<string, ConversationState>;
   private currentUserId: number;
   private currentTripId: number;
 
   constructor() {
     this.users = new Map();
     this.trips = new Map();
+    this.conversations = new Map();
     this.currentUserId = 1;
     this.currentTripId = 1;
   }
@@ -66,6 +70,15 @@ export class MemStorage implements IStorage {
 
   async getAllTrips(): Promise<Trip[]> {
     return Array.from(this.trips.values());
+  }
+
+  async getConversation(id: string): Promise<ConversationState | undefined> {
+    return this.conversations.get(id);
+  }
+
+  async saveConversation(conversation: ConversationState): Promise<ConversationState> {
+    this.conversations.set(conversation.id, conversation);
+    return conversation;
   }
 }
 

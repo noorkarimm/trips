@@ -67,6 +67,27 @@ export const generateTripSchema = z.object({
   }).optional(),
 });
 
+export const conversationSchema = z.object({
+  message: z.string().min(1, "Please provide a message"),
+  conversationId: z.string().optional(),
+});
+
+export const conversationState = z.object({
+  id: z.string(),
+  currentStep: z.enum(['initial', 'destination', 'dates', 'vibe', 'stay_style', 'activities', 'generating']),
+  responses: z.object({
+    destination: z.string().optional(),
+    dates: z.string().optional(),
+    vibe: z.string().optional(),
+    stayStyle: z.string().optional(),
+    activities: z.string().optional(),
+  }),
+  initialDescription: z.string(),
+});
+
+export type ConversationMessage = z.infer<typeof conversationSchema>;
+export type ConversationState = z.infer<typeof conversationState>;
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertTrip = z.infer<typeof insertTripSchema>;

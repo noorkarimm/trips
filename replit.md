@@ -103,6 +103,7 @@ Changelog:
 - June 21, 2025. Initial setup
 - June 21, 2025. Added visual elements with image generation for restaurants, hotels, and activities
 - June 21, 2025. Implemented hover preview cards with AI-generated images
+- June 21, 2025. Added conversational trip planning with step-by-step questions
 ```
 
 ## User Preferences
@@ -110,4 +111,5 @@ Changelog:
 ```
 Preferred communication style: Simple, everyday language.
 Visual interface preference: Wants visual elements and images for places like restaurants and hotels with hover previews.
+Trip planning preference: AI should ask specific questions (destination, dates, vibe, stay style, activities) one by one before generating final itinerary.
 ```
