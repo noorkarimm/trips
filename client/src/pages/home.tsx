@@ -355,18 +355,7 @@ export default function Home() {
               Get personalized itineraries instantly.
             </p>
             
-            {/* Example prompts */}
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {examplePrompts.map((prompt, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleExampleClick(prompt)}
-                  className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                >
-                  "{prompt}"
-                </button>
-              ))}
-            </div>
+
           </div>
 
           {/* Chat Messages */}
@@ -430,6 +419,21 @@ export default function Home() {
                     ? (generateTripMutation.error || chatMutation.error)?.message 
                     : "An error occurred"}
                 </p>
+              </div>
+            )}
+
+            {/* Example prompts below chat input */}
+            {!isConversationMode && (
+              <div className="flex flex-wrap justify-center gap-3 mt-6">
+                {examplePrompts.map((prompt, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleExampleClick(prompt)}
+                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
+                  >
+                    "{prompt}"
+                  </button>
+                ))}
               </div>
             )}
           </div>
