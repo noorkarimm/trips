@@ -422,30 +422,39 @@ export default function Home() {
               </div>
             )}
 
-            {/* Example prompts below chat input */}
+            {/* Example prompts below chat input - Two rows layout */}
             {!isConversationMode && (
-              <div className="flex flex-col items-center gap-3 mt-6">
+              <div className="w-full max-w-2xl mt-6 space-y-3">
+                {/* First row */}
                 <div className="flex flex-wrap justify-center gap-3">
-                  {examplePrompts.slice(0, 2).map((prompt, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleExampleClick(prompt)}
-                      className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                    >
-                      "{prompt}"
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => handleExampleClick("Food-focused weekend in Chicago with my spouse")}
+                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
+                  >
+                    "Food-focused weekend in Chicago with my spouse"
+                  </button>
+                  <button
+                    onClick={() => handleExampleClick("Family beach vacation under $3K")}
+                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
+                  >
+                    "Family beach vacation under $3K"
+                  </button>
                 </div>
+                
+                {/* Second row */}
                 <div className="flex flex-wrap justify-center gap-3">
-                  {examplePrompts.slice(2, 4).map((prompt, index) => (
-                    <button
-                      key={index + 2}
-                      onClick={() => handleExampleClick(prompt)}
-                      className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
-                    >
-                      "{prompt}"
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => handleExampleClick("Adventure trip to New Zealand for 2 weeks")}
+                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
+                  >
+                    "Adventure trip to New Zealand for 2 weeks"
+                  </button>
+                  <button
+                    onClick={() => handleExampleClick("Romantic getaway to Paris with wine tasting")}
+                    className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
+                  >
+                    "Romantic getaway to Paris with wine tasting"
+                  </button>
                 </div>
               </div>
             )}
