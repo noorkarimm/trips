@@ -424,9 +424,9 @@ export default function Home() {
 
             {/* Example prompts below chat input - Two rows layout */}
             {!isConversationMode && (
-              <div className="w-full max-w-2xl mt-6 space-y-3">
-                {/* First row */}
-                <div className="flex flex-wrap justify-center gap-3">
+              <div className="w-full max-w-4xl mt-6 space-y-4">
+                {/* First row - side by side */}
+                <div className="flex flex-row justify-center items-center gap-4 flex-wrap">
                   <button
                     onClick={() => handleExampleClick("Food-focused weekend in Chicago with my spouse")}
                     className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
@@ -441,8 +441,8 @@ export default function Home() {
                   </button>
                 </div>
                 
-                {/* Second row */}
-                <div className="flex flex-wrap justify-center gap-3">
+                {/* Second row - side by side */}
+                <div className="flex flex-row justify-center items-center gap-4 flex-wrap">
                   <button
                     onClick={() => handleExampleClick("Adventure trip to New Zealand for 2 weeks")}
                     className="bg-white/60 hover:bg-white/80 border border-gray-200 px-4 py-2 rounded-full text-sm text-text-primary hover:text-primary transition-all duration-200 hover:scale-105"
