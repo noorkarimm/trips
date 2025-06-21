@@ -31,6 +31,44 @@ const categoryIcons = {
   default: Star
 };
 
+const getDemoImage = (category?: string, title?: string): string => {
+  // Demo images using Unsplash with travel-related themes
+  const demoImages = {
+    food: [
+      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&crop=center", // Restaurant interior
+      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop&crop=center", // Fine dining
+      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop&crop=center", // Cafe
+      "https://images.unsplash.com/photo-1592861956120-e524fc739696?w=800&h=600&fit=crop&crop=center", // Bistro
+    ],
+    accommodation: [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop&crop=center", // Luxury hotel
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop&crop=center", // Boutique hotel
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop&crop=center", // Hotel room
+      "https://images.unsplash.com/photo-1522798514-97ceb8c4f1c8?w=800&h=600&fit=crop&crop=center", // Hotel lobby
+    ],
+    activity: [
+      "https://images.unsplash.com/photo-1539650116574-75c0c6d73273?w=800&h=600&fit=crop&crop=center", // Museum
+      "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=800&h=600&fit=crop&crop=center", // Landmark
+      "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=600&fit=crop&crop=center", // City tour
+      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=600&fit=crop&crop=center", // Architecture
+    ],
+    transport: [
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&h=600&fit=crop&crop=center", // Airport
+      "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=600&fit=crop&crop=center", // Travel
+    ]
+  };
+
+  const categoryImages = demoImages[category as keyof typeof demoImages] || demoImages.activity;
+  
+  // Use a simple hash of the title to consistently pick the same image for the same activity
+  const hash = title ? title.split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0) : 0;
+  
+  return categoryImages[Math.abs(hash) % categoryImages.length];
+};
+
 function TypingIndicator() {
   return (
     <div className="flex justify-center mt-8">
@@ -108,7 +146,7 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
                               <span className="text-sm text-green-600 font-medium">${activity.cost}</span>
                             </>
                           )}
-                          {activity.imageUrl && (
+                          {(activity.imageUrl || activity.category === 'food' || activity.category === 'accommodation') && (
                             <div className="ml-2 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
                               <Image className="w-2.5 h-2.5 text-blue-600" />
                             </div>
@@ -124,11 +162,11 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
                       </div>
                       
                       {/* Image Preview on Hover */}
-                      {activity.imageUrl && (
+                      {(activity.imageUrl || activity.category === 'food' || activity.category === 'accommodation' || activity.category === 'activity') && (
                         <div className="absolute left-full top-0 ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none z-10">
                           <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-2 max-w-sm">
                             <img 
-                              src={activity.imageUrl} 
+                              src={activity.imageUrl || getDemoImage(activity.category, activity.title)}
                               alt={activity.title}
                               className="w-64 h-48 object-cover rounded-lg"
                               onError={(e) => {

@@ -9,24 +9,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/trips/generate", async (req, res) => {
     try {
       const validatedRequest = generateTripSchema.parse(req.body);
+      console.log("Starting trip generation for:", validatedRequest.description);
       
       const result = await generateTripItinerary(validatedRequest);
+      console.log("Trip itinerary generated successfully");
       
-      // Generate images for activities
-      const enhancedResult = await generateActivityImages(result);
-      
-      // Save the generated trip
+      // Save the generated trip first
       const trip = await storage.createTrip({
         userId: null, // For now, not requiring user auth
-        title: enhancedResult.title,
+        title: result.title,
         description: validatedRequest.description,
-        destination: enhancedResult.destination,
-        duration: enhancedResult.duration,
-        budget: enhancedResult.budget,
-        itinerary: enhancedResult.itinerary,
+        destination: result.destination,
+        duration: result.duration,
+        budget: result.budget,
+        itinerary: result.itinerary,
         preferences: validatedRequest.preferences || null,
       });
 
+      // Return immediately with the trip data
       res.json({
         success: true,
         trip: {
@@ -38,6 +38,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           itinerary: trip.itinerary,
         }
       });
+
+      // TODO: Add background image generation later
+      // For now, skip images to ensure fast response
+      
     } catch (error) {
       console.error("Trip generation error:", error);
       res.status(400).json({

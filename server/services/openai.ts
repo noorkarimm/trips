@@ -36,8 +36,7 @@ export async function generateTripItinerary(request: GenerateTripRequest): Promi
                 "description": "Detailed description",
                 "location": "Specific location/address",
                 "cost": estimated_cost_in_dollars,
-                "category": "food|accommodation|activity|transport",
-                "imagePrompt": "Brief description for image generation (e.g., 'cozy Italian restaurant with outdoor seating')"
+                "category": "food|accommodation|activity|transport"
               }
             ]
           }
@@ -50,9 +49,7 @@ export async function generateTripItinerary(request: GenerateTripRequest): Promi
       }
     }
     
-    Make the itinerary detailed, realistic, and personalized. Include specific restaurant names, attractions, and practical information like timing and costs. 
-    
-    For each activity, provide an "imagePrompt" field with a brief, descriptive prompt that could be used to generate or search for relevant images. Focus on visual elements that would help users understand what the place looks like.`;
+    Make the itinerary detailed, realistic, and personalized. Include specific restaurant names, attractions, and practical information like timing and costs.`;
 
     const userPrompt = `Create a trip itinerary for: "${description}"
     
@@ -104,15 +101,20 @@ export async function generateActivityImages(tripData: {
   try {
     const enhancedItinerary = { ...tripData.itinerary };
     
-    // Generate images for select activities (to avoid hitting API limits)
+    // Only generate 1-2 images total to avoid long wait times
+    let imageCount = 0;
+    const maxImages = 2;
+    
+    // Generate images for select activities (very limited to avoid timeouts)
     for (const day of enhancedItinerary.days) {
-      for (let i = 0; i < day.activities.length; i++) {
+      if (imageCount >= maxImages) break;
+      
+      for (let i = 0; i < day.activities.length && imageCount < maxImages; i++) {
         const activity = day.activities[i];
         
-        // Generate images for key activities (restaurants, hotels, major attractions)
+        // Only generate for the most important activities (food and accommodation)
         if (activity.imagePrompt && 
-            (activity.category === 'food' || activity.category === 'accommodation' || 
-             (activity.category === 'activity' && i < 2))) { // Limit to first 2 activities per day
+            (activity.category === 'food' || activity.category === 'accommodation')) {
           
           try {
             const imageResponse = await openai.images.generate({
@@ -124,6 +126,8 @@ export async function generateActivityImages(tripData: {
             });
             
             activity.imageUrl = imageResponse.data[0].url;
+            imageCount++;
+            console.log(`Generated image ${imageCount}/${maxImages} for: ${activity.title}`);
           } catch (imageError) {
             console.warn(`Failed to generate image for activity: ${activity.title}`, imageError);
             // Continue without image if generation fails
