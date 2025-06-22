@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ChatInput, ChatInputTextArea, ChatInputSubmit } from "@/components/ui/chat-input";
+import { PromptInputBox } from "@/components/ui/ai-prompt-box";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HoverPreview } from "@/components/ui/hover-preview";
@@ -16,8 +16,6 @@ interface GeneratedTrip {
   budget?: number;
   itinerary: TripItinerary;
 }
-
-
 
 const categoryIcons = {
   food: Utensils,
@@ -243,7 +241,6 @@ interface ChatMessage {
 }
 
 export default function Home() {
-  const [inputValue, setInputValue] = useState("");
   const [generatedTrip, setGeneratedTrip] = useState<GeneratedTrip | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -279,41 +276,54 @@ export default function Home() {
     },
   });
 
-  const handleSubmit = () => {
-    if (inputValue.trim().length === 0) return;
+  const handleSend = (message: string, files?: File[]) => {
+    if (message.trim().length === 0) return;
+    
+    // Extract the actual message from special formats
+    let actualMessage = message;
+    let messageType = 'normal';
+    
+    if (message.startsWith('[Search: ') && message.endsWith(']')) {
+      actualMessage = message.slice(9, -1);
+      messageType = 'search';
+    } else if (message.startsWith('[Think: ') && message.endsWith(']')) {
+      actualMessage = message.slice(8, -1);
+      messageType = 'think';
+    } else if (message.startsWith('[Canvas: ') && message.endsWith(']')) {
+      actualMessage = message.slice(9, -1);
+      messageType = 'canvas';
+    }
     
     if (isConversationMode) {
       // Add user message to chat
-      setChatMessages(prev => [...prev, { role: 'user', content: inputValue }]);
+      setChatMessages(prev => [...prev, { role: 'user', content: actualMessage }]);
       
       chatMutation.mutate({
-        message: inputValue,
+        message: actualMessage,
         conversationId: conversationId || undefined
       });
     } else {
       // Check if this looks like a complex request that should use conversation mode
       const complexKeywords = ['family', 'adventure', 'budget', 'weeks', 'months', 'activities', 'preferences'];
       const shouldUseConversation = complexKeywords.some(keyword => 
-        inputValue.toLowerCase().includes(keyword)
+        actualMessage.toLowerCase().includes(keyword)
       );
 
       if (shouldUseConversation) {
         setIsConversationMode(true);
-        setChatMessages([{ role: 'user', content: inputValue }]);
+        setChatMessages([{ role: 'user', content: actualMessage }]);
         
         chatMutation.mutate({
-          message: inputValue
+          message: actualMessage
         });
       } else {
         // Simple trip generation
         generateTripMutation.mutate({
-          description: inputValue,
+          description: actualMessage,
           preferences: {}
         });
       }
     }
-    
-    setInputValue("");
   };
 
   const resetChat = () => {
@@ -322,6 +332,9 @@ export default function Home() {
     setIsConversationMode(false);
     setGeneratedTrip(null);
   };
+
+  const isLoading = generateTripMutation.isPending || chatMutation.isPending;
+  const error = generateTripMutation.error || chatMutation.error;
 
   return (
     <div className="min-h-screen bg-white dotted-background">
@@ -341,9 +354,6 @@ export default function Home() {
               Plan your perfect trip with{" "}
               <span className="text-primary">AI</span>
             </h2>
-
-            
-
           </div>
 
           {/* Chat Messages */}
@@ -376,41 +386,27 @@ export default function Home() {
             </div>
           )}
 
-          {/* Chat Input */}
+          {/* AI Prompt Input */}
           <div className="w-full max-w-2xl relative">
-            <div className="bg-white/95 backdrop-blur-sm border border-black/20 rounded-2xl p-3 transition-all duration-300">
-              <ChatInput
-                variant="default"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onSubmit={handleSubmit}
-                loading={generateTripMutation.isPending || chatMutation.isPending}
-                className="bg-transparent border-none shadow-none"
-              >
-                <ChatInputTextArea 
-                  placeholder={isConversationMode 
-                    ? "Type your answer..." 
-                    : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
-                  }
-                  className="bg-transparent border-none focus-visible:ring-0 shadow-none placeholder:text-text-primary/50"
-                />
-                <ChatInputSubmit className="bg-primary hover:bg-primary/90 text-white border-primary" />
-              </ChatInput>
-            </div>
+            <PromptInputBox
+              onSend={handleSend}
+              isLoading={isLoading}
+              placeholder={isConversationMode 
+                ? "Type your answer..." 
+                : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
+              }
+              className="bg-white/95 backdrop-blur-sm border-white/20 shadow-lg"
+            />
             
-            {(generateTripMutation.isPending || chatMutation.isPending) && <TypingIndicator />}
+            {isLoading && <TypingIndicator />}
             
-            {(generateTripMutation.error || chatMutation.error) && (
+            {error && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-600 text-sm">
-                  {(generateTripMutation.error || chatMutation.error) instanceof Error 
-                    ? (generateTripMutation.error || chatMutation.error)?.message 
-                    : "An error occurred"}
+                  {error instanceof Error ? error.message : "An error occurred"}
                 </p>
               </div>
             )}
-
-
           </div>
         </div>
       ) : (
