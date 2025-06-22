@@ -340,70 +340,80 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]">
       {!generatedTrip ? (
-        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
-          <div className="text-center mb-12 max-w-3xl">
-            <div className="flex items-center justify-center space-x-3 mb-8">
-              <Logo className="text-white" size={32} />
-              <h1 className="text-3xl font-bold text-white">Trips</h1>
-            </div>
-            
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
-              Plan your perfect trip with{" "}
-              <span className="text-white/90">AI</span>
-            </h2>
-          </div>
-
-          {/* Chat Messages */}
-          {isConversationMode && chatMessages.length > 0 && (
-            <div className="w-full max-w-2xl mb-8">
-              <div className="bg-transparent border-none rounded-2xl p-6 max-h-96 overflow-y-auto">
-                <div className="space-y-4">
-                  {chatMessages.map((msg, index) => (
-                    <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                      <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
-                        msg.role === 'user' 
-                          ? 'bg-white/20 backdrop-blur-sm text-white shadow-lg border border-white/20' 
-                          : 'bg-white/90 backdrop-blur-sm text-text-primary shadow-lg border border-white/20'
-                      }`}>
-                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                    </div>
-                  ))}
+        <div className="min-h-screen flex flex-col">
+          {/* Header for landing page */}
+          <header className="relative z-50 bg-white/10 backdrop-blur-md border-b border-white/20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center h-16">
+                <div className="flex items-center space-x-2">
+                  <Logo className="text-white" size={24} />
+                  <h1 className="text-xl font-bold text-white">Trips</h1>
                 </div>
               </div>
-              <div className="mt-4 text-center">
-                <Button 
-                  variant="ghost" 
-                  onClick={resetChat}
-                  className="text-white hover:bg-white/10 text-sm bg-white/10 backdrop-blur-sm rounded-full px-6"
-                >
-                  Start Over
-                </Button>
-              </div>
             </div>
-          )}
+          </header>
 
-          {/* AI Prompt Input */}
-          <div className="w-full max-w-2xl relative">
-            <PromptInputBox
-              onSend={handleSend}
-              isLoading={isLoading}
-              placeholder={isConversationMode 
-                ? "Type your answer..." 
-                : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
-              }
-              className="bg-white/10 backdrop-blur-md border-white/20 shadow-lg"
-            />
-            
-            {isLoading && <TypingIndicator />}
-            
-            {error && (
-              <div className="mt-4 p-4 bg-red-500/20 backdrop-blur-sm border border-red-300/30 rounded-lg">
-                <p className="text-white text-sm">
-                  {error instanceof Error ? error.message : "An error occurred"}
-                </p>
+          {/* Main content */}
+          <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+            <div className="text-center mb-12 max-w-3xl">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+                Plan your perfect trip with{" "}
+                <span className="text-white/90">AI</span>
+              </h2>
+            </div>
+
+            {/* Chat Messages */}
+            {isConversationMode && chatMessages.length > 0 && (
+              <div className="w-full max-w-2xl mb-8">
+                <div className="bg-transparent border-none rounded-2xl p-6 max-h-96 overflow-y-auto">
+                  <div className="space-y-4">
+                    {chatMessages.map((msg, index) => (
+                      <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                        <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+                          msg.role === 'user' 
+                            ? 'bg-white/20 backdrop-blur-sm text-white shadow-lg border border-white/20' 
+                            : 'bg-white/90 backdrop-blur-sm text-text-primary shadow-lg border border-white/20'
+                        }`}>
+                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-4 text-center">
+                  <Button 
+                    variant="ghost" 
+                    onClick={resetChat}
+                    className="text-white hover:bg-white/10 text-sm bg-white/10 backdrop-blur-sm rounded-full px-6"
+                  >
+                    Start Over
+                  </Button>
+                </div>
               </div>
             )}
+
+            {/* AI Prompt Input */}
+            <div className="w-full max-w-2xl relative">
+              <PromptInputBox
+                onSend={handleSend}
+                isLoading={isLoading}
+                placeholder={isConversationMode 
+                  ? "Type your answer..." 
+                  : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
+                }
+                className="bg-white/10 backdrop-blur-md border-white/20 shadow-lg"
+              />
+              
+              {isLoading && <TypingIndicator />}
+              
+              {error && (
+                <div className="mt-4 p-4 bg-red-500/20 backdrop-blur-sm border border-red-300/30 rounded-lg">
+                  <p className="text-white text-sm">
+                    {error instanceof Error ? error.message : "An error occurred"}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : (
