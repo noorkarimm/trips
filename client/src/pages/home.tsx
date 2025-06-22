@@ -341,8 +341,8 @@ export default function Home() {
     <div className="min-h-screen bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]">
       {!generatedTrip ? (
         <div className="min-h-screen flex flex-col">
-          {/* Header for landing page - REMOVED border-b */}
-          <header className="relative z-50 bg-white/10">
+          {/* Header for landing page - COMPLETELY TRANSPARENT */}
+          <header className="relative z-50">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center space-x-2">
@@ -418,8 +418,8 @@ export default function Home() {
         </div>
       ) : (
         <div className="min-h-screen pt-8">
-          {/* Header when showing results - REMOVED border-b */}
-          <header className="relative z-50 bg-white/10">
+          {/* Header when showing results - COMPLETELY TRANSPARENT */}
+          <header className="relative z-50">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center space-x-2">
