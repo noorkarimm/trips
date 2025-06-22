@@ -67,7 +67,7 @@ const getDemoImage = (category?: string, title?: string): string => {
 function TypingIndicator() {
   return (
     <div className="flex justify-center mt-8">
-      <div className="flex items-center space-x-3 bg-white/80 backdrop-blur-md px-6 py-3 rounded-full shadow-lg">
+      <div className="flex items-center space-x-3 bg-white/80 px-6 py-3 rounded-full shadow-lg">
         <div className="flex space-x-1">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
@@ -109,7 +109,7 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
         {trip.itinerary.days.map((day: ItineraryDay, index: number) => (
           <Card 
             key={day.day} 
-            className="bg-white/95 backdrop-blur-sm border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-white/95 border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <CardContent className="p-6">
@@ -188,7 +188,7 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
       {/* Trip Summary */}
       {trip.itinerary.summary && (
         <div className="mt-8 grid md:grid-cols-3 gap-4">
-          <Card className="bg-white/95 backdrop-blur-sm border-white/20 text-center p-6">
+          <Card className="bg-white/95 border-white/20 text-center p-6">
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
               <DollarSign className="w-6 h-6 text-primary" />
             </div>
@@ -198,7 +198,7 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
             </p>
           </Card>
           
-          <Card className="bg-white/95 backdrop-blur-sm border-white/20 text-center p-6">
+          <Card className="bg-white/95 border-white/20 text-center p-6">
             <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-3">
               <MapPin className="w-6 h-6 text-secondary" />
             </div>
@@ -208,7 +208,7 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
             </p>
           </Card>
           
-          <Card className="bg-white/95 backdrop-blur-sm border-white/20 text-center p-6">
+          <Card className="bg-white/95 border-white/20 text-center p-6">
             <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-3">
               <Star className="w-6 h-6 text-accent" />
             </div>
@@ -225,7 +225,7 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
         <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-medium">
           Save This Trip
         </Button>
-        <Button variant="outline" className="border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 px-8 py-3 rounded-xl font-medium">
+        <Button variant="outline" className="border-white/30 bg-white/10 text-white hover:bg-white/20 px-8 py-3 rounded-xl font-medium">
           Customize Itinerary
         </Button>
         <Button variant="ghost" className="text-white hover:bg-white/10 px-8 py-3 rounded-xl font-medium" onClick={() => window.location.reload()}>
