@@ -73,7 +73,7 @@ function TypingIndicator() {
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
         </div>
-        <span className="text-text-primary font-medium">AI is crafting your perfect trip...</span>
+        <span className="text-text-primary font-medium">Your AI travel assistant is thinking...</span>
       </div>
     </div>
   );
@@ -295,36 +295,14 @@ export default function Home() {
       messageType = 'canvas';
     }
     
-    if (isConversationMode) {
-      // Add user message to chat
-      setChatMessages(prev => [...prev, { role: 'user', content: actualMessage }]);
-      
-      chatMutation.mutate({
-        message: actualMessage,
-        conversationId: conversationId || undefined
-      });
-    } else {
-      // Check if this looks like a complex request that should use conversation mode
-      const complexKeywords = ['family', 'adventure', 'budget', 'weeks', 'months', 'activities', 'preferences'];
-      const shouldUseConversation = complexKeywords.some(keyword => 
-        actualMessage.toLowerCase().includes(keyword)
-      );
-
-      if (shouldUseConversation) {
-        setIsConversationMode(true);
-        setChatMessages([{ role: 'user', content: actualMessage }]);
-        
-        chatMutation.mutate({
-          message: actualMessage
-        });
-      } else {
-        // Simple trip generation
-        generateTripMutation.mutate({
-          description: actualMessage,
-          preferences: {}
-        });
-      }
-    }
+    // Always use the intelligent chat system
+    setIsConversationMode(true);
+    setChatMessages(prev => [...prev, { role: 'user', content: actualMessage }]);
+    
+    chatMutation.mutate({
+      message: actualMessage,
+      conversationId: conversationId || undefined
+    });
   };
 
   const resetChat = () => {
@@ -369,12 +347,12 @@ export default function Home() {
                   <div className="space-y-4">
                     {chatMessages.map((msg, index) => (
                       <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                        <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+                        <div className={`inline-block max-w-[80%] p-4 rounded-2xl ${
                           msg.role === 'user' 
                             ? 'bg-white/20 text-white shadow-lg border border-white/20' 
-                            : 'bg-white/90 text-text-primary shadow-lg border border-white/20'
+                            : 'bg-white/95 text-text-primary shadow-lg border border-white/20'
                         }`}>
-                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                         </div>
                       </div>
                     ))}
@@ -398,8 +376,8 @@ export default function Home() {
                 onSend={handleSend}
                 isLoading={isLoading}
                 placeholder={isConversationMode 
-                  ? "Type your answer..." 
-                  : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
+                  ? "Tell me more..." 
+                  : "Describe your dream trip... (e.g., 'I want a romantic weekend in Paris' or 'Family vacation to Costa Rica')"
                 }
                 className="bg-white/10 border-white/20 shadow-lg"
               />

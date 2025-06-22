@@ -74,7 +74,7 @@ export const conversationSchema = z.object({
 
 export const conversationState = z.object({
   id: z.string(),
-  currentStep: z.enum(['initial', 'dates', 'vibe', 'stay_style', 'activities', 'generating']),
+  currentStep: z.enum(['gathering_info', 'completed']),
   responses: z.object({
     dates: z.string().optional(),
     vibe: z.string().optional(),
@@ -82,6 +82,10 @@ export const conversationState = z.object({
     activities: z.string().optional(),
   }),
   initialDescription: z.string(),
+  conversationHistory: z.array(z.object({
+    role: z.enum(['user', 'assistant']),
+    content: z.string()
+  })).optional(),
 });
 
 export type ConversationMessage = z.infer<typeof conversationSchema>;

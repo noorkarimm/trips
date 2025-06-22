@@ -2,10 +2,15 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { generateTripSchema, insertTripSchema, conversationSchema, type ConversationState } from "@shared/schema";
-import { generateTripItinerary, generateActivityImages } from "./services/openai";
+import { 
+  generateTripItinerary, 
+  generateActivityImages, 
+  analyzeUserPromptAndAskQuestions,
+  generateConversationalResponse 
+} from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Chat conversation endpoint
+  // Intelligent chat conversation endpoint
   app.post("/api/chat", async (req, res) => {
     try {
       const { message, conversationId } = conversationSchema.parse(req.body);
@@ -22,19 +27,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         conversation = existing;
       } else {
-        // New conversation
+        // New conversation - analyze the initial prompt
+        const analysis = await analyzeUserPromptAndAskQuestions(message);
+        
+        if (!analysis.needsMoreInfo) {
+          // User provided enough info, generate trip directly
+          const result = await generateTripItinerary({ 
+            description: message,
+            preferences: {}
+          });
+          
+          const trip = await storage.createTrip({
+            userId: null,
+            title: result.title,
+            description: message,
+            destination: result.destination,
+            duration: result.duration,
+            budget: result.budget,
+            itinerary: result.itinerary,
+            preferences: null,
+          });
+
+          return res.json({
+            success: true,
+            response: "Perfect! I've created your personalized itinerary based on your request. Let me know if you'd like me to adjust anything!",
+            isComplete: true,
+            trip: {
+              id: trip.id,
+              title: trip.title,
+              destination: trip.destination,
+              duration: trip.duration,
+              budget: trip.budget,
+              itinerary: trip.itinerary,
+            }
+          });
+        }
+
+        // Need more info - start conversation
         conversation = {
           id: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          currentStep: 'initial',
+          currentStep: 'gathering_info',
           responses: {},
-          initialDescription: message
+          initialDescription: message,
+          conversationHistory: [
+            { role: 'user', content: message }
+          ]
         };
+
+        await storage.saveConversation(conversation);
+
+        return res.json({
+          success: true,
+          response: analysis.question || "I'd love to help you plan the perfect trip! Could you tell me a bit more about what you have in mind?",
+          conversationId: conversation.id,
+          isComplete: false
+        });
       }
 
-      // Process the conversation step
-      const response = await processConversationStep(conversation, message);
-      
-      res.json(response);
+      // Continue existing conversation
+      const conversationHistory = conversation.conversationHistory || [];
+      const aiResponse = await generateConversationalResponse(conversationHistory, message);
+
+      // Update conversation history
+      conversation.conversationHistory = [
+        ...conversationHistory,
+        { role: 'user', content: message },
+        { role: 'assistant', content: aiResponse.response }
+      ];
+
+      if (aiResponse.shouldGenerateItinerary && aiResponse.fullTripDescription) {
+        // Generate the final itinerary
+        const result = await generateTripItinerary({ 
+          description: aiResponse.fullTripDescription,
+          preferences: {}
+        });
+        
+        const trip = await storage.createTrip({
+          userId: null,
+          title: result.title,
+          description: aiResponse.fullTripDescription,
+          destination: result.destination,
+          duration: result.duration,
+          budget: result.budget,
+          itinerary: result.itinerary,
+          preferences: null,
+        });
+
+        conversation.currentStep = 'completed';
+        await storage.saveConversation(conversation);
+
+        return res.json({
+          success: true,
+          response: aiResponse.response,
+          conversationId: conversation.id,
+          isComplete: true,
+          trip: {
+            id: trip.id,
+            title: trip.title,
+            destination: trip.destination,
+            duration: trip.duration,
+            budget: trip.budget,
+            itinerary: trip.itinerary,
+          }
+        });
+      }
+
+      await storage.saveConversation(conversation);
+
+      res.json({
+        success: true,
+        response: aiResponse.response,
+        conversationId: conversation.id,
+        isComplete: false
+      });
     } catch (error) {
       console.error("Chat error:", error);
       res.status(400).json({
@@ -129,109 +234,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
-}
-
-async function processConversationStep(conversation: ConversationState, message: string) {
-  const questions = {
-    dates: "Travel Dates – What month or specific dates are you planning your trip?",
-    vibe: "Vibe – Do you want a mix of nature, city, beach, or adventure? Any specific regions or landscapes you're interested in (like mountains, rainforests, coastlines, etc.)?",
-    stay_style: "Stay Style – Do you prefer hotels, eco-lodges, vacation rentals, or something else?",
-    activities: "Must-Do Activities – Any specific adventures or interests your family wants to include (like zip-lining, wildlife tours, snorkeling, cultural experiences, etc.)?"
-  };
-
-  switch (conversation.currentStep) {
-    case 'initial':
-      conversation.currentStep = 'dates';
-      await storage.saveConversation(conversation);
-      return {
-        success: true,
-        response: `Great! I'd love to help you plan the perfect trip. Let me ask you a few quick questions:\n\n${questions.dates}`,
-        conversationId: conversation.id,
-        isComplete: false
-      };
-
-    case 'dates':
-      conversation.responses.dates = message;
-      conversation.currentStep = 'vibe';
-      await storage.saveConversation(conversation);
-      return {
-        success: true,
-        response: questions.vibe,
-        conversationId: conversation.id,
-        isComplete: false
-      };
-
-    case 'vibe':
-      conversation.responses.vibe = message;
-      conversation.currentStep = 'stay_style';
-      await storage.saveConversation(conversation);
-      return {
-        success: true,
-        response: questions.stay_style,
-        conversationId: conversation.id,
-        isComplete: false
-      };
-
-    case 'stay_style':
-      conversation.responses.stayStyle = message;
-      conversation.currentStep = 'activities';
-      await storage.saveConversation(conversation);
-      return {
-        success: true,
-        response: questions.activities,
-        conversationId: conversation.id,
-        isComplete: false
-      };
-
-    case 'activities':
-      conversation.responses.activities = message;
-      conversation.currentStep = 'generating';
-      await storage.saveConversation(conversation);
-      
-      // Generate the final itinerary
-      const fullDescription = `${conversation.initialDescription}
-      
-Travel Dates: ${conversation.responses.dates}
-Vibe/Style: ${conversation.responses.vibe}
-Accommodation: ${conversation.responses.stayStyle}
-Activities: ${conversation.responses.activities}`;
-
-      const result = await generateTripItinerary({ 
-        description: fullDescription,
-        preferences: {}
-      });
-      
-      // Save the generated trip
-      const trip = await storage.createTrip({
-        userId: null,
-        title: result.title,
-        description: fullDescription,
-        destination: result.destination,
-        duration: result.duration,
-        budget: result.budget,
-        itinerary: result.itinerary,
-        preferences: null,
-      });
-
-      return {
-        success: true,
-        response: "Perfect! With your answers, I've created the best destinations, activities, and accommodations—all within your budget and aligned with your travel style!",
-        conversationId: conversation.id,
-        isComplete: true,
-        trip: {
-          id: trip.id,
-          title: trip.title,
-          destination: trip.destination,
-          duration: trip.duration,
-          budget: trip.budget,
-          itinerary: trip.itinerary,
-        }
-      };
-
-    default:
-      return {
-        success: false,
-        error: "Invalid conversation state"
-      };
-  }
 }
