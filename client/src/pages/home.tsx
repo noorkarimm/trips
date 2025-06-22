@@ -342,8 +342,8 @@ export default function Home() {
       {!generatedTrip ? (
         <div className="min-h-screen flex flex-col">
           {/* Header for landing page */}
-          <header className="relative z-50 bg-white/10 backdrop-blur-md border-b border-white/20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <header className="relative z-50 bg-white/10 border-b border-white/20">
+            <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center space-x-2">
                   <Logo className="text-white" size={24} />
@@ -371,8 +371,8 @@ export default function Home() {
                       <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                         <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
                           msg.role === 'user' 
-                            ? 'bg-white/20 backdrop-blur-sm text-white shadow-lg border border-white/20' 
-                            : 'bg-white/90 backdrop-blur-sm text-text-primary shadow-lg border border-white/20'
+                            ? 'bg-white/20 text-white shadow-lg border border-white/20' 
+                            : 'bg-white/90 text-text-primary shadow-lg border border-white/20'
                         }`}>
                           <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                         </div>
@@ -384,7 +384,7 @@ export default function Home() {
                   <Button 
                     variant="ghost" 
                     onClick={resetChat}
-                    className="text-white hover:bg-white/10 text-sm bg-white/10 backdrop-blur-sm rounded-full px-6"
+                    className="text-white hover:bg-white/10 text-sm bg-white/10 rounded-full px-6"
                   >
                     Start Over
                   </Button>
@@ -401,13 +401,13 @@ export default function Home() {
                   ? "Type your answer..." 
                   : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
                 }
-                className="bg-white/10 backdrop-blur-md border-white/20 shadow-lg"
+                className="bg-white/10 border-white/20 shadow-lg"
               />
               
               {isLoading && <TypingIndicator />}
               
               {error && (
-                <div className="mt-4 p-4 bg-red-500/20 backdrop-blur-sm border border-red-300/30 rounded-lg">
+                <div className="mt-4 p-4 bg-red-500/20 border border-red-300/30 rounded-lg">
                   <p className="text-white text-sm">
                     {error instanceof Error ? error.message : "An error occurred"}
                   </p>
@@ -419,8 +419,8 @@ export default function Home() {
       ) : (
         <div className="min-h-screen pt-8">
           {/* Header when showing results */}
-          <header className="relative z-50 bg-white/10 backdrop-blur-md border-b border-white/20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <header className="relative z-50 bg-white/10 border-b border-white/20">
+            <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center space-x-2">
                   <Logo className="text-white" size={24} />
