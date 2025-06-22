@@ -97,8 +97,8 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
   return (
     <div className="w-full max-w-4xl mx-auto px-4 pb-16 animate-[slideUp_0.5s_ease-out]">
       <div className="text-center mb-8">
-        <h3 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">{trip.title}</h3>
-        <p className="text-text-primary/70">
+        <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{trip.title}</h3>
+        <p className="text-white/80">
           {trip.duration} days • {trip.destination}
           {trip.budget && ` • Budget: $${trip.budget.toLocaleString()}`}
         </p>
@@ -224,10 +224,10 @@ function ItineraryResults({ trip }: { trip: GeneratedTrip }) {
         <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-medium">
           Save This Trip
         </Button>
-        <Button variant="outline" className="border-primary/20 text-text-primary hover:text-primary px-8 py-3 rounded-xl font-medium">
+        <Button variant="outline" className="border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 px-8 py-3 rounded-xl font-medium">
           Customize Itinerary
         </Button>
-        <Button variant="ghost" className="text-text-primary hover:text-primary px-8 py-3 rounded-xl font-medium" onClick={() => window.location.reload()}>
+        <Button variant="ghost" className="text-white hover:bg-white/10 px-8 py-3 rounded-xl font-medium" onClick={() => window.location.reload()}>
           Plan Another Trip
         </Button>
       </div>
@@ -337,22 +337,22 @@ export default function Home() {
   const error = generateTripMutation.error || chatMutation.error;
 
   return (
-    <div className="min-h-screen bg-white dotted-background">
+    <div className="min-h-screen bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]">
       {!generatedTrip ? (
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
           <div className="text-center mb-12 max-w-3xl">
             <div className="flex items-center justify-center space-x-3 mb-8">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <h1 className="text-3xl font-bold text-text-primary">Trips</h1>
+              <h1 className="text-3xl font-bold text-white">Trips</h1>
             </div>
             
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
               Plan your perfect trip with{" "}
-              <span className="text-primary">AI</span>
+              <span className="text-white/90">AI</span>
             </h2>
           </div>
 
@@ -365,7 +365,7 @@ export default function Home() {
                     <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                       <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
                         msg.role === 'user' 
-                          ? 'bg-primary text-white shadow-lg' 
+                          ? 'bg-white/20 backdrop-blur-sm text-white shadow-lg border border-white/20' 
                           : 'bg-white/90 backdrop-blur-sm text-text-primary shadow-lg border border-white/20'
                       }`}>
                         <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -378,7 +378,7 @@ export default function Home() {
                 <Button 
                   variant="ghost" 
                   onClick={resetChat}
-                  className="text-text-primary hover:text-primary text-sm bg-white/80 backdrop-blur-sm rounded-full px-6"
+                  className="text-white hover:bg-white/10 text-sm bg-white/10 backdrop-blur-sm rounded-full px-6"
                 >
                   Start Over
                 </Button>
@@ -395,14 +395,14 @@ export default function Home() {
                 ? "Type your answer..." 
                 : "Describe your ideal trip... (e.g., 'I want a romantic weekend in Paris with my partner, focusing on art and wine')"
               }
-              className="bg-white/95 backdrop-blur-sm border-white/20 shadow-lg"
+              className="bg-white/10 backdrop-blur-md border-white/20 shadow-lg"
             />
             
             {isLoading && <TypingIndicator />}
             
             {error && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">
+              <div className="mt-4 p-4 bg-red-500/20 backdrop-blur-sm border border-red-300/30 rounded-lg">
+                <p className="text-white text-sm">
                   {error instanceof Error ? error.message : "An error occurred"}
                 </p>
               </div>
@@ -412,21 +412,21 @@ export default function Home() {
       ) : (
         <div className="min-h-screen pt-8">
           {/* Header when showing results */}
-          <header className="relative z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+          <header className="relative z-50 bg-white/10 backdrop-blur-md border-b border-white/20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                     </svg>
                   </div>
-                  <h1 className="text-xl font-bold text-text-primary">Trips</h1>
+                  <h1 className="text-xl font-bold text-white">Trips</h1>
                 </div>
                 
                 <Button 
                   variant="ghost" 
-                  className="text-text-primary hover:text-primary font-medium"
+                  className="text-white hover:bg-white/10 font-medium"
                   onClick={() => window.location.reload()}
                 >
                   Plan New Trip
