@@ -5,12 +5,11 @@ import { generateTripSchema, insertTripSchema, conversationSchema, type Conversa
 import { 
   generateTripItinerary, 
   generateActivityImages, 
-  analyzeUserPromptAndAskQuestions,
   generateConversationalResponse 
 } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Intelligent chat conversation endpoint
+  // Natural AI conversation endpoint
   app.post("/api/chat", async (req, res) => {
     try {
       const { message, conversationId } = conversationSchema.parse(req.body);
@@ -27,64 +26,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         conversation = existing;
       } else {
-        // New conversation - analyze the initial prompt
-        const analysis = await analyzeUserPromptAndAskQuestions(message);
-        
-        if (!analysis.needsMoreInfo) {
-          // User provided enough info, generate trip directly
-          const result = await generateTripItinerary({ 
-            description: message,
-            preferences: {}
-          });
-          
-          const trip = await storage.createTrip({
-            userId: null,
-            title: result.title,
-            description: message,
-            destination: result.destination,
-            duration: result.duration,
-            budget: result.budget,
-            itinerary: result.itinerary,
-            preferences: null,
-          });
-
-          return res.json({
-            success: true,
-            response: "Perfect! I've created your personalized itinerary based on your request. Let me know if you'd like me to adjust anything!",
-            isComplete: true,
-            trip: {
-              id: trip.id,
-              title: trip.title,
-              destination: trip.destination,
-              duration: trip.duration,
-              budget: trip.budget,
-              itinerary: trip.itinerary,
-            }
-          });
-        }
-
-        // Need more info - start conversation
+        // New conversation
         conversation = {
           id: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          currentStep: 'gathering_info',
+          currentStep: 'chatting',
           responses: {},
           initialDescription: message,
-          conversationHistory: [
-            { role: 'user', content: message }
-          ]
+          conversationHistory: []
         };
-
-        await storage.saveConversation(conversation);
-
-        return res.json({
-          success: true,
-          response: analysis.question || "I'd love to help you plan the perfect trip! Could you tell me a bit more about what you have in mind?",
-          conversationId: conversation.id,
-          isComplete: false
-        });
       }
 
-      // Continue existing conversation
+      // Get AI response
       const conversationHistory = conversation.conversationHistory || [];
       const aiResponse = await generateConversationalResponse(conversationHistory, message);
 

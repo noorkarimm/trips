@@ -73,7 +73,7 @@ function TypingIndicator() {
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
         </div>
-        <span className="text-text-primary font-medium">Your AI travel assistant is thinking...</span>
+        <span className="text-text-primary font-medium">Thinking...</span>
       </div>
     </div>
   );
@@ -265,37 +265,21 @@ export default function Home() {
     },
   });
 
-  const generateTripMutation = useMutation({
-    mutationFn: async (request: GenerateTripRequest) => {
-      const response = await apiRequest("POST", "/api/trips/generate", request);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      if (data.success) {
-        setGeneratedTrip(data.trip);
-      }
-    },
-  });
-
   const handleSend = (message: string, files?: File[]) => {
     if (message.trim().length === 0) return;
     
     // Extract the actual message from special formats
     let actualMessage = message;
-    let messageType = 'normal';
     
     if (message.startsWith('[Search: ') && message.endsWith(']')) {
       actualMessage = message.slice(9, -1);
-      messageType = 'search';
     } else if (message.startsWith('[Think: ') && message.endsWith(']')) {
       actualMessage = message.slice(8, -1);
-      messageType = 'think';
     } else if (message.startsWith('[Canvas: ') && message.endsWith(']')) {
       actualMessage = message.slice(9, -1);
-      messageType = 'canvas';
     }
     
-    // Always use the intelligent chat system
+    // Always use the natural AI conversation
     setIsConversationMode(true);
     setChatMessages(prev => [...prev, { role: 'user', content: actualMessage }]);
     
@@ -312,14 +296,14 @@ export default function Home() {
     setGeneratedTrip(null);
   };
 
-  const isLoading = generateTripMutation.isPending || chatMutation.isPending;
-  const error = generateTripMutation.error || chatMutation.error;
+  const isLoading = chatMutation.isPending;
+  const error = chatMutation.error;
 
   return (
     <div className="min-h-screen bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)]">
       {!generatedTrip ? (
         <div className="min-h-screen flex flex-col">
-          {/* Header for landing page - COMPLETELY TRANSPARENT */}
+          {/* Header for landing page */}
           <header className="relative z-50">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
@@ -344,12 +328,12 @@ export default function Home() {
             {isConversationMode && chatMessages.length > 0 && (
               <div className="w-full max-w-2xl mb-8">
                 <div className="bg-transparent border-none rounded-2xl p-6 max-h-96 overflow-y-auto">
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {chatMessages.map((msg, index) => (
                       <div key={index} className={`${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                        <div className={`inline-block max-w-[80%] p-4 rounded-2xl ${
+                        <div className={`inline-block max-w-[85%] p-4 rounded-2xl ${
                           msg.role === 'user' 
-                            ? 'bg-white/20 text-white shadow-lg border border-white/20' 
+                            ? 'bg-white/15 text-white shadow-lg border border-white/20' 
                             : 'bg-white/95 text-text-primary shadow-lg border border-white/20'
                         }`}>
                           <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
@@ -376,8 +360,8 @@ export default function Home() {
                 onSend={handleSend}
                 isLoading={isLoading}
                 placeholder={isConversationMode 
-                  ? "Tell me more..." 
-                  : "Describe your dream trip... (e.g., 'I want a romantic weekend in Paris' or 'Family vacation to Costa Rica')"
+                  ? "Continue the conversation..." 
+                  : "Tell me about your dream trip... (e.g., 'I want a romantic weekend in Paris' or 'Family vacation to Costa Rica')"
                 }
                 className="bg-white/10 border-white/20 shadow-lg"
               />
@@ -396,7 +380,7 @@ export default function Home() {
         </div>
       ) : (
         <div className="min-h-screen pt-8">
-          {/* Header when showing results - COMPLETELY TRANSPARENT */}
+          {/* Header when showing results */}
           <header className="relative z-50">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
