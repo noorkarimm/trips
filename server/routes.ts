@@ -161,17 +161,6 @@ async function processConversationStep(conversation: ConversationState, message:
         isComplete: false
       };
 
-    case 'dates':
-      conversation.responses.dates = message;
-      conversation.currentStep = 'vibe';
-      await storage.saveConversation(conversation);
-      return {
-        success: true,
-        response: questions.vibe,
-        conversationId: conversation.id,
-        isComplete: false
-      };
-
     case 'vibe':
       conversation.responses.vibe = message;
       conversation.currentStep = 'stay_style';
