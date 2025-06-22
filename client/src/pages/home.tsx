@@ -343,7 +343,7 @@ export default function Home() {
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
           <div className="text-center mb-12 max-w-3xl">
             <div className="flex items-center justify-center space-x-3 mb-8">
-              <Logo className="text-white" size={40} />
+              <Logo className="text-white" size={32} />
               <h1 className="text-3xl font-bold text-white">Trips</h1>
             </div>
             
